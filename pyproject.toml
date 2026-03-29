@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "qrypto"
+version = "1.0.0"
+description = "Scan, encrypt, and regenerate QR codes securely"
+requires-python = ">=3.9"
+dependencies = [
+    "opencv-python",
+    "cryptography",
+    "qrcode[pil]",
+    "keyring",
+    "typer",
+    "rich",
+]
+
+[project.scripts]
+qrypto = "qrypto:app"
+
+[tool.setuptools]
+py-modules = ["qrypto"]
