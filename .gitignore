@@ -1,5 +1,5 @@
-# Never commit the key file — this alone can decrypt all your tokens
-.qrypto/qr.key
+# Never commit the .qrypto directory — it contains your encrypted tokens and key
+.qrypto/
 
 # Regenerated QR images — these contain your actual secrets
 *_qr.png

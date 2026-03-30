@@ -4,3 +4,6 @@ qrcode[pil]
 keyring
 typer
 rich
+fastapi
+uvicorn[standard]
+python-multipart

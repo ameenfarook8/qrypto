@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import os
 import base64
 from pathlib import Path
 from datetime import datetime
@@ -40,7 +41,10 @@ app = typer.Typer(
         "  qrypto scan my.png aws-prod --keyfile\n\n"
         "  qrypto regen aws-prod\n\n"
         "  qrypto show aws-prod\n\n"
-        "  qrypto list"
+        "  qrypto list\n\n"
+        "  qrypto ui\n\n"
+        "  qrypto ui --background\n\n"
+        "  qrypto ui --stop"
     ),
     pretty_exceptions_show_locals=False,
     pretty_exceptions_enable=False,
@@ -579,6 +583,77 @@ def list_entries():
         )
 
     console.print(table)
+
+
+# ---------------------------------------------------------------------------
+# Web UI
+# ---------------------------------------------------------------------------
+
+def _pid_file() -> Path:
+    return resolve_qrypto_dir() / "ui.pid"
+
+
+@app.command()
+def ui(
+    port: int = typer.Option(8000, "--port", "-p", help="Port to listen on"),
+    host: str = typer.Option("127.0.0.1", "--host", help="Host to bind to"),
+    background: bool = typer.Option(False, "--background", "-b", help="Run server in background"),
+    stop: bool = typer.Option(False, "--stop", help="Stop a background server"),
+):
+    """Start the web UI in your browser."""
+    import signal
+
+    if stop:
+        pid_path = _pid_file()
+        if not pid_path.exists():
+            console.print("[yellow]No background server found.[/yellow]")
+            raise typer.Exit(0)
+        pid = int(pid_path.read_text().strip())
+        try:
+            os.kill(pid, signal.SIGTERM)
+            pid_path.unlink()
+            console.print(f"[bold green]Stopped[/bold green] Qrypto UI (pid {pid})")
+        except ProcessLookupError:
+            pid_path.unlink(missing_ok=True)
+            console.print("[yellow]Server was not running (stale pid file removed).[/yellow]")
+        raise typer.Exit(0)
+
+    try:
+        import uvicorn
+        from server import app as fastapi_app
+    except ImportError as e:
+        console.print(f"[bold red]Missing dependency:[/bold red] {e}")
+        console.print("Install with: [cyan]pip install fastapi uvicorn[standard] python-multipart[/cyan]")
+        raise typer.Exit(1)
+
+    url = f"http://{host}:{port}"
+
+    if background:
+        import subprocess, sys
+        pid_path = _pid_file()
+        if pid_path.exists():
+            existing = pid_path.read_text().strip()
+            console.print(f"[yellow]Server already running (pid {existing}).[/yellow] Use [cyan]qrypto ui --stop[/cyan] first.")
+            raise typer.Exit(1)
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "server:app", "--host", host, "--port", str(port)],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        pid_path.write_text(str(proc.pid))
+        console.print(Panel(
+            f"[bold green]Qrypto UI[/bold green] running in background → [cyan]{url}[/cyan]\n\n"
+            f"[dim]pid {proc.pid} · stop with:[/dim] [bold]qrypto ui --stop[/bold]",
+            border_style="green",
+        ))
+        return
+
+    console.print(Panel(
+        f"[bold green]Qrypto UI[/bold green] → [cyan]{url}[/cyan]\n\n"
+        f"[dim]Press Ctrl+C to stop[/dim]",
+        border_style="green",
+    ))
+    uvicorn.run(fastapi_app, host=host, port=port)
 
 
 # ---------------------------------------------------------------------------

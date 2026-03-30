@@ -119,6 +119,7 @@ qrypto scan my.png aws-prod
 qrypto regen aws-prod
 qrypto show aws-prod
 qrypto list
+qrypto ui
 ```
 
 > If you haven't run `qrypto init`, commands fall back to `~/.qrypto` in your home directory automatically.
@@ -202,6 +203,53 @@ qrypto rotate --name github --keyfile-new
 ```bash
 qrypto list
 ```
+
+### Web UI
+
+Start a local web interface in your browser:
+
+```bash
+qrypto ui
+```
+
+Opens at `http://localhost:8000` — a GitHub-dark UI where you can:
+
+- Drag & drop QR images to scan and encrypt
+- View all entries in a table
+- Show any QR code inline
+- Regenerate and download QR images
+- Delete entries
+
+**Custom port:**
+```bash
+qrypto ui --port 9000
+```
+
+**Run in background** (returns terminal immediately):
+```bash
+qrypto ui --background
+qrypto ui -b              # shorthand
+```
+
+**Stop the background server:**
+```bash
+qrypto ui --stop
+```
+
+The background server saves its PID to `.qrypto/ui.pid`. If the server crashes or is killed manually, `--stop` will detect the stale file and clean it up automatically.
+
+Requires `fastapi`, `uvicorn`, and `python-multipart` — installed automatically when using pipx or `pip install -e .`.
+
+## Security warning
+
+> [!WARNING]
+> The `.qrypto/` directory contains your encrypted tokens and (if using `--keyfile`) your key file. **Keep it secure.**
+
+- **Never commit it to git** — `.qrypto/` is in `.gitignore` by default. Do not remove it.
+- **Never share it** — anyone with both `qr_store.json` and your key (or password) can decrypt all your secrets.
+- **Back it up securely** — if you lose `.qrypto/qr_store.json`, your encrypted entries are gone. Use encrypted cloud storage (iCloud, encrypted zip, etc.) or a password manager.
+- **If using `--keyfile`** — `qr.key` is the most sensitive file. Losing it means you cannot recover any entries encrypted with it. Store it separately from `qr_store.json`.
+- **The web UI (`qrypto ui`) binds to `127.0.0.1` only** — it is not accessible from other devices. Never expose it to a public network.
 
 ## Supported QR code types
 

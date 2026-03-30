@@ -15,6 +15,9 @@ dependencies = [
     "keyring",
     "typer",
     "rich",
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
 ]
 
 [project.scripts]
