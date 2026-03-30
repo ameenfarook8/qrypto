@@ -22,6 +22,7 @@ Then use `qrypto` from that folder:
 ```bash
 qrypto scan my.png aws-prod
 qrypto regen aws-prod
+qrypto show aws-prod
 qrypto list
 ```
 
@@ -62,6 +63,17 @@ qrypto regen aws-prod --password "my phrase"
 qrypto regen aws-prod --keyfile
 ```
 Saves QR as `aws-prod_qr.png`. Use the same auth mode as `scan`.
+
+### Show QR code in terminal
+```bash
+qrypto show <name> [--password <phrase> | --keyfile]
+```
+```bash
+qrypto show aws-prod                        # keychain (default)
+qrypto show aws-prod --password "my phrase"
+qrypto show aws-prod --keyfile
+```
+Decrypts the stored entry and renders the QR code directly in your terminal using Unicode block characters. Use the same auth mode as `scan`.
 
 ### Rotate to a new key
 

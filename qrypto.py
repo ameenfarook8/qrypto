@@ -39,6 +39,7 @@ app = typer.Typer(
         "  qrypto scan my.png aws-prod --password 'my phrase'\n\n"
         "  qrypto scan my.png aws-prod --keyfile\n\n"
         "  qrypto regen aws-prod\n\n"
+        "  qrypto show aws-prod\n\n"
         "  qrypto list"
     ),
     pretty_exceptions_show_locals=False,
@@ -435,6 +436,53 @@ def regen(
         title="[bold green]QR Regenerated[/bold green]",
         border_style="green",
     ))
+
+
+@app.command()
+def show(
+    name: str = typer.Argument(..., help="Name of the stored entry"),
+    password: Optional[str] = typer.Option(None, "--password", "-p", help="Passphrase used during scan"),
+    keyfile: bool = typer.Option(False, "--keyfile", "-f", help="Use a key file instead of Keychain"),
+):
+    """Decrypt a stored entry and display its QR code in the terminal."""
+    store = load_store()
+    if name not in store:
+        console.print(f"[bold red]No entry found for '{name}'.[/bold red] Run [cyan]list[/cyan] to see all entries.")
+        raise typer.Exit(1)
+
+    stored_auth = store[name].get("auth", "keychain")
+    used_auth = detect_auth(password, keyfile)
+    if used_auth != stored_auth:
+        hint = {
+            "keychain": f"qrypto show {name}",
+            "password": f"qrypto show {name} --password <your-password>",
+            "key-file": f"qrypto show {name} --keyfile",
+        }.get(stored_auth, "")
+        console.print(
+            f"[bold red]Wrong auth method.[/bold red] "
+            f"'{name}' was encrypted with [cyan]{stored_auth}[/cyan], "
+            f"but you used [yellow]{used_auth}[/yellow].\n"
+            f"[dim]Try:[/dim] [bold]{hint}[/bold]"
+        )
+        raise typer.Exit(1)
+
+    with Progress(SpinnerColumn(), TextColumn("{task.description}"), transient=True) as progress:
+        progress.add_task("Resolving key...", total=None)
+        key = resolve_key(password, keyfile)
+
+    try:
+        data = decrypt(store[name]["token"], key)
+    except Exception:
+        console.print("[bold red]Decryption failed.[/bold red] Wrong password or key.")
+        raise typer.Exit(1)
+
+    qr = qrcode.QRCode()
+    qr.add_data(data)
+    qr.make(fit=True)
+
+    console.print(f"\n[bold cyan]{name}[/bold cyan]")
+    qr.print_ascii(invert=True)
+    console.print()
 
 
 @app.command(
