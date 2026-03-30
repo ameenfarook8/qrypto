@@ -8,6 +8,34 @@ Designed for securely storing 2FA QR codes — scan once, delete the image, rege
 
 Requires Python 3.9+ and [pipx](https://pipx.pypa.io).
 
+### Don't have Python?
+
+**macOS:**
+```bash
+brew install python
+```
+> Don't have Homebrew? Install it from [brew.sh](https://brew.sh)
+
+**Windows:**
+Download the installer from [python.org/downloads](https://www.python.org/downloads) and run it.
+Make sure to check **"Add Python to PATH"** during installation.
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt update && sudo apt install python3 python3-pip
+```
+
+### Don't have pipx?
+
+Once Python is installed:
+```bash
+pip install pipx
+pipx ensurepath
+```
+Then restart your terminal.
+
+---
+
 **Latest version (tracks `main` branch):**
 ```bash
 pipx install git+https://github.com/ameenfarook8/qrypto.git
