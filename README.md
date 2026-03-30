@@ -11,9 +11,11 @@ Requires Python 3.9+ and [pipx](https://pipx.pypa.io).
 ### Don't have Python?
 
 **macOS:**
+
 ```bash
 brew install python
 ```
+
 > Don't have Homebrew? Install it from [brew.sh](https://brew.sh)
 
 **Windows:**
@@ -21,6 +23,7 @@ Download the installer from [python.org/downloads](https://www.python.org/downlo
 Make sure to check **"Add Python to PATH"** during installation.
 
 **Linux (Ubuntu/Debian):**
+
 ```bash
 sudo apt update && sudo apt install python3 python3-pip
 ```
@@ -28,25 +31,30 @@ sudo apt update && sudo apt install python3 python3-pip
 ### Don't have pipx?
 
 Once Python is installed:
+
 ```bash
 pip install pipx
 pipx ensurepath
 ```
+
 Then restart your terminal.
 
 ---
 
 **Latest version (tracks `main` branch):**
+
 ```bash
 pipx install git+https://github.com/ameenfarook8/qrypto.git
 ```
 
 **Specific release (stable, pinned):**
+
 ```bash
 pipx install git+https://github.com/ameenfarook8/qrypto.git@v1.0.1
 ```
 
 **Upgrade to latest:**
+
 ```bash
 pipx upgrade qrypto
 ```
@@ -54,6 +62,7 @@ pipx upgrade qrypto
 > Note: if you installed a specific tag (`@v1.0.1`), upgrade won't move to a newer tag — uninstall and reinstall with the new version instead.
 
 ### Uninstall
+
 ```bash
 pipx uninstall qrypto
 ```
@@ -68,7 +77,7 @@ git clone https://github.com/ameenfarook8/qrypto.git
 cd qrypto
 
 # 2. Create a virtual environment
-python3 -m venv venv
+python -m venv venv
 
 # 3. Activate it
 source venv/bin/activate        # macOS / Linux
@@ -86,6 +95,7 @@ python qrypto.py list
 > To deactivate the virtual environment when done: `deactivate`
 
 To get updates later:
+
 ```bash
 git pull
 pip install -r requirements.txt  # in case dependencies changed
@@ -96,12 +106,14 @@ pip install -r requirements.txt  # in case dependencies changed
 ## Setup
 
 After installing, navigate to the folder you want to use as your store and initialise it:
+
 ```bash
 cd ~/my-secure-folder
 qrypto init
 ```
 
 Then use `qrypto` from that folder:
+
 ```bash
 qrypto scan my.png aws-prod
 qrypto regen aws-prod
@@ -113,18 +125,20 @@ qrypto list
 
 ## Auth modes
 
-| Flag | Mechanism | Default? |
-|------|-----------|----------|
-| _(none)_ | macOS Keychain (Touch ID protected) | **Yes** |
-| `--password <phrase>` | PBKDF2 key derived from passphrase | No |
-| `--keyfile` | Key file (`qr.key` in current dir, prompts if missing) | No |
+| Flag                  | Mechanism                                              | Default? |
+| --------------------- | ------------------------------------------------------ | -------- |
+| _(none)_              | macOS Keychain (Touch ID protected)                    | **Yes**  |
+| `--password <phrase>` | PBKDF2 key derived from passphrase                     | No       |
+| `--keyfile`           | Key file (`qr.key` in current dir, prompts if missing) | No       |
 
 ## Usage
 
 ### Scan & encrypt a QR code
+
 ```bash
 qrypto scan <image_path> <name> [--password <phrase> | --keyfile]
 ```
+
 ```bash
 qrypto scan my_qr.png aws-prod              # keychain (default)
 qrypto scan my_qr.png aws-prod --password "my phrase"
@@ -132,25 +146,31 @@ qrypto scan my_qr.png aws-prod --keyfile
 ```
 
 ### Regenerate QR from name
+
 ```bash
 qrypto regen <name> [--password <phrase> | --keyfile]
 ```
+
 ```bash
 qrypto regen aws-prod                       # keychain (default)
 qrypto regen aws-prod --password "my phrase"
 qrypto regen aws-prod --keyfile
 ```
+
 Saves QR as `aws-prod_qr.png`. Use the same auth mode as `scan`.
 
 ### Show QR code in terminal
+
 ```bash
 qrypto show <name> [--password <phrase> | --keyfile]
 ```
+
 ```bash
 qrypto show aws-prod                        # keychain (default)
 qrypto show aws-prod --password "my phrase"
 qrypto show aws-prod --keyfile
 ```
+
 Decrypts the stored entry and renders the QR code directly in your terminal using Unicode block characters. Use the same auth mode as `scan`.
 
 ### Rotate to a new key
@@ -178,6 +198,7 @@ qrypto rotate --name github --keyfile-new
 ```
 
 ### List all stored entries
+
 ```bash
 qrypto list
 ```
@@ -186,23 +207,23 @@ qrypto list
 
 Any QR code can be encrypted and stored. The tool auto-detects the type and stores safe metadata:
 
-| Type | Detection | Metadata stored |
-|------|-----------|----------------|
-| `2FA` | `otpauth://` URI | issuer, account, OTP type — **secret encrypted only, never stored in plaintext** |
-| `URL` | `http://` / `https://` | domain |
-| `WiFi` | `WIFI:` prefix | SSID |
-| `Generic` | anything else | — |
+| Type      | Detection              | Metadata stored                                                                  |
+| --------- | ---------------------- | -------------------------------------------------------------------------------- |
+| `2FA`     | `otpauth://` URI       | issuer, account, OTP type — **secret encrypted only, never stored in plaintext** |
+| `URL`     | `http://` / `https://` | domain                                                                           |
+| `WiFi`    | `WIFI:` prefix         | SSID                                                                             |
+| `Generic` | anything else          | —                                                                                |
 
 ## Output files
 
 All data files are stored in `.qrypto/` — created by `qrypto init` in the current directory, or falls back to `~/.qrypto/` if not initialised. Every command prints the active store path in dim text so you always know which store is being used.
 
-| File | Purpose |
-|------|---------|
-| `.qrypto/qr.key` | Key file (only when using `--keyfile`) |
+| File                    | Purpose                                                       |
+| ----------------------- | ------------------------------------------------------------- |
+| `.qrypto/qr.key`        | Key file (only when using `--keyfile`)                        |
 | `.qrypto/qr_store.json` | Entries: name, issuer, account, type, auth, date — no secrets |
-| `.qrypto/qr_store.md` | Same content as a readable markdown table |
-| `<name>_qr.png` | Regenerated QR code image (written to current directory) |
+| `.qrypto/qr_store.md`   | Same content as a readable markdown table                     |
+| `<name>_qr.png`         | Regenerated QR code image (written to current directory)      |
 
 ## How it works
 
