@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "qrypto"
 version = "1.0.0"
 description = "Scan, encrypt, and regenerate QR codes securely"
+license = {text = "MIT"}
 requires-python = ">=3.9"
 dependencies = [
     "opencv-python",
