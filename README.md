@@ -58,6 +58,41 @@ pipx upgrade qrypto
 pipx uninstall qrypto
 ```
 
+## Run from source (no install)
+
+If you prefer to clone and run directly without installing:
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/ameenfarook8/qrypto.git
+cd qrypto
+
+# 2. Create a virtual environment
+python3 -m venv venv
+
+# 3. Activate it
+source venv/bin/activate        # macOS / Linux
+venv\Scripts\activate           # Windows
+
+# 4. Install dependencies
+pip install -r requirements.txt
+
+# 5. Run directly
+python qrypto.py --help
+python qrypto.py scan my.png aws-prod
+python qrypto.py list
+```
+
+> To deactivate the virtual environment when done: `deactivate`
+
+To get updates later:
+```bash
+git pull
+pip install -r requirements.txt  # in case dependencies changed
+```
+
+---
+
 ## Setup
 
 After installing, navigate to the folder you want to use as your store and initialise it:
