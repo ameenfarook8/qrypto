@@ -4,15 +4,35 @@ Scan a QR code from an image, encrypt its data, and store it under a readable na
 
 Designed for securely storing 2FA QR codes — scan once, delete the image, regenerate when needed.
 
-## Setup
+## Install
 
-Install as a CLI tool (one time):
+Requires Python 3.9+ and [pipx](https://pipx.pypa.io).
+
+**Latest version (tracks `main` branch):**
 ```bash
-cd qrypto
-pip install -e .
+pipx install git+https://github.com/ameenfarook8/qrypto.git
 ```
 
-After that, navigate to the folder you want to use as your store and initialise it:
+**Specific release (stable, pinned):**
+```bash
+pipx install git+https://github.com/ameenfarook8/qrypto.git@v1.0.1
+```
+
+**Upgrade to latest:**
+```bash
+pipx upgrade qrypto
+```
+
+> Note: if you installed a specific tag (`@v1.0.1`), upgrade won't move to a newer tag — uninstall and reinstall with the new version instead.
+
+### Uninstall
+```bash
+pipx uninstall qrypto
+```
+
+## Setup
+
+After installing, navigate to the folder you want to use as your store and initialise it:
 ```bash
 cd ~/my-secure-folder
 qrypto init
@@ -27,11 +47,6 @@ qrypto list
 ```
 
 > If you haven't run `qrypto init`, commands fall back to `~/.qrypto` in your home directory automatically.
-
-### Uninstall
-```bash
-pip uninstall qrypto
-```
 
 ## Auth modes
 
